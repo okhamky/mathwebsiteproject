@@ -1,0 +1,92 @@
+{% extends 'pace/base.html' %}
+{% block content %}
+<nav class="navbar navbar-inverse" style="background-color: #e3f2fd">
+    <h1 class="navbar-brand">
+        Camelot Academy
+    </h1>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'pace:teacher' teacher_name %}"> {{ teacher_name }}'s Students </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">All Students</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Add New Student</a>
+        </li>
+    </ul>
+</nav>
+    <br>
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <ul class="list-group">
+                {% for student in teacher_students %}
+                    {% if student.user.username == student_name %}
+                        <a class="list-group-item active" href="{% url 'pace:teacher' teacher_name student.user.username %}"> {{ student.first_name }} {{ student.last_name }} </a>
+                    {% else %}
+                        <a class="list-group-item list-group-item-action" href="{% url 'pace:teacher' teacher_name student.user.username %}"> {{ student.first_name }} {{ student.last_name }} </a>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-9">
+            {% if student_name %}
+                {% for pacechapter in student_chapters|slice:"1" %}
+                    <h2>{{ pacechapter.student.first_name }} {{ pacechapter.student.last_name }}'s Pace Chart</h2>
+                {% endfor %}
+            <table class="table table-bordered table-hover table-sm">
+                <thead>
+                    <tr class="table-info">
+                        <th class=" text-center col-md-3">Book</th>
+                        <th class="text-center col-md-1">Chapter</th>
+                        <th class="text-center col-md-2">Projected Date</th>
+                        <th class="text-center col-md-2">Completion Date</th>
+                        <th class="text-center col-md-1">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pacechapter in student_chapters %}
+                        {% if pacechapter.complete_date %}
+                            {% if not pacechapter.pace_date %}
+                                <tr class="table-success">
+                            {% elif pacechapter.pace_date >= pacechapter.complete_date %}
+                                <tr class="table-success">
+                            {% else %}
+                                <tr class="table-warning">
+                            {% endif %}
+                        {% elif pacechapter.pace_date < date_today %}
+                            <tr class="table-danger">
+                        {% else %}
+                            <tr>
+                        {% endif %}
+                                <td class="text-center">
+                                    {{ pacechapter.chapter.book.book_name }}
+                                </td>
+                                <td class="text-center">
+                                    {{ pacechapter.chapter.chapter_number }}
+                                </td>
+                                <td class="text-center">
+                                    {% if pacechapter.pace_date %}
+                                    {{ pacechapter.pace_date|date:"F j" }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if pacechapter.complete_date %}
+                                    {{ pacechapter.complete_date|date:"F j" }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if pacechapter.score %}
+                                    {{ pacechapter.score|floatformat:"0" }}%
+                                {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

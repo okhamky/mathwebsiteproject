@@ -1,5 +1,5 @@
 """
-WSGI config for mathwebsiteproject project.
+WSGI config for MathWebsite project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
