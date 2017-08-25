@@ -1,0 +1,78 @@
+{% extends 'pace/base.html' %}
+{% block content %}
+<div class="card text-center">
+    <h1>{{ user.student }}'s Pace Chart</h1>
+</div>
+    <br><br>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <table class="table table-bordered table-hover table-sm">
+                <thead>
+                    <tr class="table-info">
+                        <th class="text-center col-md-3">Book</th>
+                        <th class="text-center col-md-1">Chapter</th>
+                        <th class="text-center col-md-2">Projected Date</th>
+                        <th class="text-center col-md-2">Completion Date</th>
+                        <th class="text-center col-md-1">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for pacechapter in all_chapters %}
+                        {% if pacechapter.complete_date %}
+                            {% if not pacechapter.pace_date %}
+                                <tr class="table-success">
+                            {% elif pacechapter.pace_date >= pacechapter.complete_date %}
+                                <tr class="table-success">
+                            {% else %}
+                                <tr class="table-warning">
+                            {% endif %}
+                        {% elif pacechapter.pace_date < date_today %}
+                            <tr class="table-danger">
+                        {% else %}
+                            <tr>
+                        {% endif %}
+                                <td class="text-center">
+                                    {{ pacechapter.chapter.book.book_name }}
+                                </td>
+                                <td class="text-center">
+                                    {{ pacechapter.chapter.chapter_number }}
+                                </td>
+                                <td class="text-center">
+                                    {% if pacechapter.pace_date %}
+                                    {{ pacechapter.pace_date|date:"F j" }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if pacechapter.complete_date %}
+                                    {{ pacechapter.complete_date|date:"F j" }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if pacechapter.score %}
+                                    {{ pacechapter.score|floatformat:"0" }}%
+                                {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    <br><br>
+<div class="container">
+    <table class="table table-bordered table-sm">
+        <tbody>
+            <tr><td colspan="4" class="text-center table-info"><strong>Key</strong></td></tr>
+            <tr>
+                <td class="text-center col-md-2">Not Yet Due</td>
+                <td class="table-success text-center col-md-2">Completed On Time</td>
+                <td class="table-warning text-center col-md-2">Completed Late</td>
+                <td class="table-danger text-center col-md-2">Incomplete and Late</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

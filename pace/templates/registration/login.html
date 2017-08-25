@@ -1,0 +1,43 @@
+{% extends 'pace/base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row"> <br> <br></div>
+    <div class="row justify-content-md-center align-items-center">
+            <h1>Welcome to Camelot Math. Please log in.</h1>
+    </div>
+    <div class="row justify-content-md-center align-items-center">
+            {% if form.errors %}
+            <p>Your username and password didn't match. Please try again.</p>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                <p>Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.</p>
+                {% else %}
+                <p>Please login to see this page.</p>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'pace:login' %}">
+            {% csrf_token %}
+            <table>
+            <tr>
+                <td>{{ form.username.label_tag }}</td>
+                <td>{{ form.username }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.password.label_tag }}</td>
+                <td>{{ form.password }}</td>
+            </tr>
+            </table>
+            <input type="submit" value="login" />
+            <input type="hidden" name="next" value="{{ next }}" />
+            </form>
+    </div>
+    <div class="row justify-content-md-center">
+            {# Assumes you setup the password_reset view in your URLconf #}
+            <p><a href="{% url 'pace:password_reset' %}">Lost password?</a></p>
+    </div>
+</div>
+{% endblock %}
