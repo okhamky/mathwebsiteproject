@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^whereto/', views.whereto, name='whereto'),
     url(r'^pacechart/', views.pacechart, name='pacechart'),
-    url(r'^teacher/(?P<teacher_name>[a-zA-Z ]+)/$', views.teacher, name='teacher'),
-    url(r'^teacher/(?P<teacher_name>[a-zA-Z ]+)/(?P<student_name>[a-zA-Z0-9 ]+)/$', views.teacher, name='teacher'),
+    url(r'^teacher/(?P<teacher_name>[a-zA-Z0-9 ]+)/$', views.teacher, name='teacher'),
+    url(r'^teacher/(?P<teacher_name>[a-zA-Z0-9 ]+)/addstudent/$', views.addstudent, name='addstudent'),
+    url(r'^teacher/(?P<teacher_name>[a-zA-Z0-9 ]+)/(?P<student_name>[a-zA-Z0-9 ]+)/$', views.teacher, name='teacher'),
 ]

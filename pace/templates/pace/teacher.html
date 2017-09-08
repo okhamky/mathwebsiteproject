@@ -12,7 +12,7 @@
             <a class="nav-link" href="#">All Students</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Add New Student</a>
+            <a class="nav-link" href="{% url 'pace:addstudent' teacher_name %}">Add New Student</a>
         </li>
     </ul>
 </nav>
@@ -23,9 +23,9 @@
             <ul class="list-group">
                 {% for student in teacher_students %}
                     {% if student.user.username == student_name %}
-                        <a class="list-group-item active" href="{% url 'pace:teacher' teacher_name student.user.username %}"> {{ student.first_name }} {{ student.last_name }} </a>
+                        <a class="list-group-item active" href="{% url 'pace:teacher' teacher_name student.user.username %}"> {{ student.user.first_name }} {{ student.user.last_name }} </a>
                     {% else %}
-                        <a class="list-group-item list-group-item-action" href="{% url 'pace:teacher' teacher_name student.user.username %}"> {{ student.first_name }} {{ student.last_name }} </a>
+                        <a class="list-group-item list-group-item-action" href="{% url 'pace:teacher' teacher_name student.user.username %}"> {{ student.user.first_name }} {{ student.user.last_name }} </a>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -33,8 +33,9 @@
         <div class="col-9">
             {% if student_name %}
                 {% for pacechapter in student_chapters|slice:"1" %}
-                    <h2>{{ pacechapter.student.first_name }} {{ pacechapter.student.last_name }}'s Pace Chart</h2>
+                    <h2>{{ pacechapter.student.user.first_name }} {{ pacechapter.student.user.last_name }}'s Pace Chart</h2>
                 {% endfor %}
+            {% if student_chapters %}
             <table class="table table-bordered table-hover table-sm">
                 <thead>
                     <tr class="table-info">
@@ -45,6 +46,9 @@
                         <th class="text-center col-md-1">Score</th>
                     </tr>
                 </thead>
+            {% else %}
+            <h2>{{ student_name }} has no pace data yet!</h2>
+            {% endif %}
                 <tbody>
                     {% for pacechapter in student_chapters %}
                         {% if pacechapter.complete_date %}
