@@ -17,16 +17,14 @@ class Teacher(models.Model):
 
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     teacher = models.ManyToManyField(Teacher)
 
     class Meta:
-            ordering = ["last_name"]
+            ordering = ["user__last_name"]
 
     def __str__(self):
-        return self.first_name + self.last_name
+        return self.user.first_name + " " + self.user.last_name
 
 
 class Book(models.Model):

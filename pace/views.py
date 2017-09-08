@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Prefetch
-from .models import PaceChapter, Student
+from .models import PaceChapter, Student, Teacher
 from datetime import date
 from itertools import chain
+from .forms import AddStudentForm, UserForm
 
 def index(request):
     return render(request, 'pace/index.html')
@@ -42,7 +43,7 @@ def pacechart(request, user=None):
 @login_required
 @user_passes_test(is_teacher)
 def teacher(request, teacher_name, student_name=None):
-    teacher_students = Student.objects.prefetch_related('teacher').all()
+    teacher_students = Student.objects.filter(teacher__user__username=teacher_name)
     if student_name:
         student_chapters = PaceChapter.objects.prefetch_related('student__user').filter(student__user__username=student_name)
         student_chapters_not_null = student_chapters.filter(pace_date__isnull=False)
@@ -60,3 +61,31 @@ def teacher(request, teacher_name, student_name=None):
     return render(request, 'pace/teacher.html', context)
 
 
+@login_required
+@user_passes_test(is_teacher)
+def addstudent(request, teacher_name=None):
+    if request.method == 'POST':
+        student_form = AddStudentForm(request.POST)
+        user_form = UserForm(request.POST)
+        if user_form.is_valid():
+            new_student = student_form.save(commit=False)
+            new_student.user = user_form.save()
+            if student_form.is_valid():
+                comment = 'Success! Student added.'
+                student_form.save()
+            else:
+                comment = 'Please correct the errors below. (SF)'
+        else:
+            comment = 'Please correct the errors below. (UF)'
+    else:
+        student_form = AddStudentForm(initial={'teacher': Teacher.objects.filter(user__username=teacher_name)})
+        user_form = UserForm()
+        comment = None
+
+    context = {
+        'teacher_name': teacher_name,
+        'student_form': student_form,
+        'user_form': user_form,
+        'top_comment': comment,
+            }
+    return render(request, 'pace/addstudent.html', context)

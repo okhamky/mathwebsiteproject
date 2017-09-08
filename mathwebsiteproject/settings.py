@@ -25,9 +25,7 @@ SECRET_KEY = '5qt$(2+vej0a3o(6qr^f3yo&bhkk88s004@8p&=s8otdndlp6_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'math.camelotapps.org',
-]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -123,6 +121,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
