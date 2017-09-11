@@ -4,10 +4,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Prefetch
-from .models import PaceChapter, Student, Teacher
+from .models import PaceChapter, Student, Teacher, Chapter
 from datetime import date
 from itertools import chain
-from .forms import AddStudentForm, UserForm
+from .forms import AddStudentForm, UserForm, AddBookToStudentForm, AddChapterToStudentForm, DeleteChapterForm
 
 def index(request):
     return render(request, 'pace/index.html')
@@ -89,3 +89,100 @@ def addstudent(request, teacher_name=None):
         'top_comment': comment,
             }
     return render(request, 'pace/addstudent.html', context)
+
+
+@login_required
+@user_passes_test(is_teacher)
+def add_book_to_student(request, teacher_name=None, student_name=None):
+    if request.method == 'POST':
+        form = AddBookToStudentForm()
+        comment = None
+        context = {
+            'teacher_name': teacher_name,
+            'student_name': student_name,
+            'form': form,
+            'top_comment': comment,
+        }
+        return render(request, 'pace/addbooktostudent.html', context)
+    else:
+        return redirect('pace:whereto')
+
+
+@login_required
+@user_passes_test(is_teacher)
+def add_chapter_to_student(request, teacher_name, student_name):
+    if request.method == 'POST':
+        book_form = AddBookToStudentForm(request.POST)
+        if book_form.is_valid():
+            data = book_form.cleaned_data
+            chosen_book = data['book']
+            chapter_form = AddChapterToStudentForm()
+            chapter_form.fields["chapter"].queryset = Chapter.objects.filter(book__book_name=chosen_book)
+        else:
+            return HttpResponse('book choice error')
+        comment = None
+        context = {
+            'teacher_name': teacher_name,
+            'student_name': student_name,
+            'chosen_book': str(chosen_book),
+            'form': chapter_form,
+            'top_comment': comment,
+        }
+        return render(request, 'pace/addchaptertostudent.html', context)
+    else:
+        return redirect('pace:whereto')
+
+
+@login_required
+@user_passes_test(is_teacher)
+def add_selected_chapters(request, teacher_name, student_name, chosen_book):
+    if request.method == 'POST':
+        chapters_form = AddChapterToStudentForm(request.POST)
+        if chapters_form.is_valid():
+            data = chapters_form.cleaned_data
+            chosen_chapters = data['chapter'].values()
+            for chapter in chosen_chapters:
+                chapter_number = chapter['chapter_number']
+                PaceChapter.objects.create(
+                    student=Student.objects.filter(user__username=student_name).first(),
+                    chapter=Chapter.objects.filter(book__book_name=chosen_book, chapter_number=chapter_number).first()
+                )
+            return redirect('pace:teacher', teacher_name, student_name)
+        else:
+            return redirect('pace:teacher', teacher_name, student_name)
+    else:
+        return redirect('pace:whereto')
+
+
+@login_required
+@user_passes_test(is_teacher)
+def delete_chapter(request, teacher_name, student_name):
+    if request.method == 'POST':
+        form = DeleteChapterForm()
+        form.fields["chapter"].queryset = PaceChapter.objects.filter(student__user__username=student_name)
+        comment = None
+        context = {
+            'teacher_name': teacher_name,
+            'student_name': student_name,
+            'form': form,
+            'top_comment': comment,
+        }
+        return render(request, 'pace/deletechapter.html', context)
+    else:
+        return redirect('pace:teacher', teacher_name, student_name)
+
+@login_required
+@user_passes_test(is_teacher)
+def delete_selected_chapter(request, teacher_name, student_name):
+    if request.method == 'POST':
+        selected_chapters_form = DeleteChapterForm(request.POST)
+        if selected_chapters_form.is_valid():
+            selected_chapters = selected_chapters_form.cleaned_data["chapter"]
+            for pacechapter in selected_chapters:
+                target = pacechapter
+                target.delete()
+            return redirect('pace:teacher', teacher_name, student_name)
+        else:
+            return HttpResponse('deletion error')
+    else:
+        return redirect('pace:teacher', teacher_name, student_name)
