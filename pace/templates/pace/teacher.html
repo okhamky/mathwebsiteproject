@@ -32,63 +32,76 @@
         </div>
         <div class="col-9">
             {% if student_name %}
+                {% if not student_chapters %}
+                    <h2>{{ student_name }} has no pace data yet!</h2>
+                {% endif %}
                 {% for pacechapter in student_chapters|slice:"1" %}
                     <h2>{{ pacechapter.student.user.first_name }} {{ pacechapter.student.user.last_name }}'s Pace Chart</h2>
                 {% endfor %}
-            {% if student_chapters %}
-            <table class="table table-bordered table-hover table-sm">
-                <thead>
-                    <tr class="table-info">
-                        <th class=" text-center col-md-3">Book</th>
-                        <th class="text-center col-md-1">Chapter</th>
-                        <th class="text-center col-md-2">Projected Date</th>
-                        <th class="text-center col-md-2">Completion Date</th>
-                        <th class="text-center col-md-1">Score</th>
-                    </tr>
-                </thead>
-            {% else %}
-            <h2>{{ student_name }} has no pace data yet!</h2>
-            {% endif %}
-                <tbody>
-                    {% for pacechapter in student_chapters %}
-                        {% if pacechapter.complete_date %}
-                            {% if not pacechapter.pace_date %}
-                                <tr class="table-success">
-                            {% elif pacechapter.pace_date >= pacechapter.complete_date %}
-                                <tr class="table-success">
-                            {% else %}
-                                <tr class="table-warning">
-                            {% endif %}
-                        {% elif pacechapter.pace_date < date_today %}
-                            <tr class="table-danger">
-                        {% else %}
-                            <tr>
-                        {% endif %}
-                                <td class="text-center">
-                                    {{ pacechapter.chapter.book.book_name }}
-                                </td>
-                                <td class="text-center">
-                                    {{ pacechapter.chapter.chapter_number }}
-                                </td>
-                                <td class="text-center">
-                                    {% if pacechapter.pace_date %}
-                                    {{ pacechapter.pace_date|date:"F j" }}
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if pacechapter.complete_date %}
-                                    {{ pacechapter.complete_date|date:"F j" }}
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                {% if pacechapter.score %}
-                                    {{ pacechapter.score|floatformat:"0" }}%
+                <div class="btn-toolbar" role="toolbar">
+                    <form action="{% url 'pace:add_book_to_student' teacher_name student_name %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-sm btn-success">Add Chapter(s)</button>
+                    </form>
+                    &nbsp;&nbsp;
+                    <form action="{% url 'pace:delete_chapter' teacher_name student_name %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-sm btn-danger">Delete Chapter(s)</button>
+                    </form>
+                </div>
+                <br><br>
+                {% if student_chapters %}
+                <table class="table table-bordered table-hover table-sm">
+                    <thead>
+                        <tr class="table-info">
+                            <th class="text-center">Book</th>
+                            <th class="text-center">Chapter</th>
+                            <th class="text-center">Projected Date</th>
+                            <th class="text-center">Completion Date</th>
+                            <th class="text-center">Score</th>
+                        </tr>
+                    </thead>
+                {% endif %}
+                    <tbody>
+                        {% for pacechapter in student_chapters %}
+                            {% if pacechapter.complete_date %}
+                                {% if not pacechapter.pace_date %}
+                                    <tr class="table-success">
+                                {% elif pacechapter.pace_date >= pacechapter.complete_date %}
+                                    <tr class="table-success">
+                                {% else %}
+                                    <tr class="table-warning">
                                 {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                </tbody>
-            </table>
+                            {% elif pacechapter.pace_date < date_today %}
+                                <tr class="table-danger">
+                            {% else %}
+                                <tr>
+                            {% endif %}
+                                    <td class="text-center">
+                                        {{ pacechapter.chapter.book.book_name }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{ pacechapter.chapter.chapter_number }}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if pacechapter.pace_date %}
+                                        {{ pacechapter.pace_date|date:"F j" }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if pacechapter.complete_date %}
+                                        {{ pacechapter.complete_date|date:"F j" }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                    {% if pacechapter.score %}
+                                        {{ pacechapter.score|floatformat:"0" }}%
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
         </div>
     </div>

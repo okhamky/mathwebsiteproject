@@ -31,7 +31,7 @@ class Book(models.Model):
     book_name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.book_name + "Book Object"
+        return str(self.book_name)
 
 
 class Chapter(models.Model):
@@ -43,7 +43,7 @@ class Chapter(models.Model):
         return self.book
 
     def __str__(self):
-        return self.book.book_name + " - " + str(self.chapter_number) + "Chapter Object"
+        return str(self.chapter_number)
 
 
 class PaceChapter(models.Model):
@@ -61,4 +61,4 @@ class PaceChapter(models.Model):
         ordering = ['pace_date']
 
     def __str__(self):
-        return str(self.chapter) + "Pace Chapter Object"
+        return self.chapter.book.book_name + ' - Chapter ' + str(self.chapter)

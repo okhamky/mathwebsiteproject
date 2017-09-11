@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, Student
+from .models import User, Student, Book, Chapter, PaceChapter
 
 
 class UserForm(forms.ModelForm):
@@ -13,3 +13,14 @@ class AddStudentForm(forms.ModelForm):
         model = Student
         fields = ['teacher', 'user']
 
+
+class AddBookToStudentForm(forms.Form):
+    book = forms.ModelChoiceField(Book.objects.all(), widget=forms.RadioSelect, empty_label=None)
+
+
+class AddChapterToStudentForm(forms.Form):
+    chapter = forms.ModelMultipleChoiceField(Chapter.objects.all(), widget=forms.CheckboxSelectMultiple)
+
+
+class DeleteChapterForm(forms.Form):
+    chapter = forms.ModelMultipleChoiceField(PaceChapter.objects.all(), widget=forms.CheckboxSelectMultiple)

@@ -9,6 +9,7 @@ class ChapterInline(admin.TabularInline):
     model = Chapter
     extra = 0
 
+
 class BookAdmin(admin.ModelAdmin):
     inlines = [ChapterInline]
 
@@ -20,7 +21,9 @@ class PaceChapterInline(admin.TabularInline):
     model = PaceChapter
     extra = 0
 
+
 class StudentAdmin(admin.ModelAdmin):
     inlines = [PaceChapterInline]
+
 
 admin.site.register(Student, StudentAdmin)
