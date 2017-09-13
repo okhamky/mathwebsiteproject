@@ -103,6 +103,11 @@
                                         {{ pacechapter.score|floatformat:"0" }}%
                                     {% endif %}
                                     </td>
+                                    <td class="text-center">
+                                        <form action="{% url 'pace:edit_grade' teacher_name student_name pacechapter.id %}">
+                                            <button type="submit" class="btn-sm btn-primary">Edit Grade</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             {% endfor %}
                     </tbody>

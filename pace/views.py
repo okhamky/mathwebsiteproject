@@ -8,7 +8,8 @@ from .models import PaceChapter, Student, Teacher, Chapter
 from datetime import date
 from itertools import chain
 from django.forms import modelformset_factory
-from .forms import AddStudentForm, UserForm, AddBookToStudentForm, AddChapterToStudentForm, DeleteChapterForm, EditPaceDatesForm
+from .forms import AddStudentForm, UserForm, AddBookToStudentForm, AddChapterToStudentForm, DeleteChapterForm, \
+    EditPaceDatesForm, EditGradeForm
 
 def index(request):
     return render(request, 'pace/index.html')
@@ -226,3 +227,47 @@ def save_pace_dates(request, teacher_name, student_name):
             return render(request, 'pace/editpacedates.html', context)
     else:
         return redirect('pace:teacher', teacher_name, student_name)
+
+
+@login_required
+@user_passes_test(is_teacher)
+def edit_grade(request, teacher_name, student_name, pacechapter):
+    if request.method == 'POST':
+        try:
+            chapter_instance = PaceChapter.objects.get(pk=pacechapter)
+        except:
+            return redirect('pace:teacher', teacher_name, student_name)
+        form = EditGradeForm(request.POST, instance=chapter_instance)
+        if form.is_valid():
+            form.save()
+            return redirect('pace:teacher', teacher_name, student_name)
+        else:
+            comment = "Please correct the errors below"
+            context = {
+                'teacher_name': teacher_name,
+                'student_name': student_name,
+                'pacechapter': pacechapter,
+                'form': form,
+                'top_comment': comment,
+            }
+            return render(request, 'pace/editscore.html', context)
+    else:
+        try:
+            chapter_instance = PaceChapter.objects.get(pk=pacechapter)
+        except:
+            return redirect('pace:teacher', teacher_name, student_name)
+        if chapter_instance.student.user.username == student_name:
+            form = EditGradeForm(instance=chapter_instance)
+            if not form.initial['complete_date']:
+                form.initial['complete_date'] = date.today()
+            comment = None
+            context = {
+                'teacher_name': teacher_name,
+                'student_name': student_name,
+                'pacechapter': pacechapter,
+                'form': form,
+                'top_comment': comment,
+            }
+            return render(request, 'pace/editscore.html', context)
+        else:
+            return redirect('pace:teacher', teacher_name, student_name)

@@ -32,3 +32,12 @@ class EditPaceDatesForm(forms.ModelForm):
     class Meta:
         model = PaceChapter
         fields = ['chapter', 'pace_date']
+
+
+class EditGradeForm(forms.ModelForm):
+    chapter = forms.ModelChoiceField(Chapter.objects.all(), disabled=True)
+    pace_date = forms.CharField(disabled=True)
+
+    class Meta:
+        model = PaceChapter
+        fields = ['chapter', 'pace_date', 'complete_date', 'score']

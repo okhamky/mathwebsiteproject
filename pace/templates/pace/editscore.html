@@ -1,0 +1,60 @@
+{% extends 'pace/base.html' %}
+{% block content %}
+<nav class="navbar navbar-inverse" style="background-color: #e3f2fd">
+    <h1 class="navbar-brand">
+        Camelot Academy
+    </h1>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'pace:teacher' teacher_name %}"> {{ teacher_name }}'s Students </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">All Students</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'pace:addstudent' teacher_name %}">Add New Student</a>
+        </li>
+    </ul>
+</nav>
+    <br>
+<div class="container">
+    {% if top_comment %}
+        {{ top_comment }}
+        <br><br>
+    {% endif %}
+    <h4>Student: {{ student_name }}</h4>
+    <h6 class="text-danger">Please input dates in one of the following formats: 5/18/2017, 5/18/17, or 2017-5-18</h6>
+    <h6 class="text-danger">Please input grades as a percentage. For example, enter a 95.3% as 95.3</h6>
+    <form action="{% url 'pace:edit_grade' teacher_name student_name pacechapter %}" method="post">
+        {% csrf_token %}
+        {{ form.id }}
+        {{ form.non_field_errors }}
+        <table>
+            <thead>
+                <tr>
+                    <td>{{ form.chapter.label }}</td>
+                    <td>{{ form.pace_date.label}}</td>
+                    <td>{{ form.complete_date.label }}</td>
+                    <td>{{ form.score.label }}</td>
+                </tr>
+            </thead>
+                <tr>
+                    <td>{{ form.chapter }}</td>
+                    <td>{{ form.pace_date }}</td>
+                    <td>{{ form.complete_date }}</td>
+                    <td>{{ form.score }}</td>
+                </tr>
+                <tr>
+                    <td class="text-left text-danger">{{ form.chapter.errors }}</td>
+                    <td class="text-left text-danger">{{ form.pace_date.errors }}</td>
+                    <td class="text-left text-danger">{{ form.complete_date.errors }}</td>
+                    <td class="text-left text-danger">{{ form.score.errors }}</td>
+                </tr>
+        </table>
+                <br>
+        <input type="submit" value="Save Changes" />
+    </form>
+</div>
+
+
+{% endblock %}
