@@ -24,3 +24,11 @@ class AddChapterToStudentForm(forms.Form):
 
 class DeleteChapterForm(forms.Form):
     chapter = forms.ModelMultipleChoiceField(PaceChapter.objects.all(), widget=forms.CheckboxSelectMultiple)
+
+
+class EditPaceDatesForm(forms.ModelForm):
+    chapter = forms.ModelChoiceField(Chapter.objects.all(), disabled=True)
+
+    class Meta:
+        model = PaceChapter
+        fields = ['chapter', 'pace_date']

@@ -7,7 +7,8 @@ from django.db.models import Prefetch
 from .models import PaceChapter, Student, Teacher, Chapter
 from datetime import date
 from itertools import chain
-from .forms import AddStudentForm, UserForm, AddBookToStudentForm, AddChapterToStudentForm, DeleteChapterForm
+from django.forms import modelformset_factory
+from .forms import AddStudentForm, UserForm, AddBookToStudentForm, AddChapterToStudentForm, DeleteChapterForm, EditPaceDatesForm
 
 def index(request):
     return render(request, 'pace/index.html')
@@ -19,7 +20,7 @@ def whereto(request):
     elif request.user.groups.filter(name='Teacher').exists():
         return redirect('/teacher/' + str(request.user.username))
     else:
-        return HttpResponse("You are not a teacher or a student. Whoops! Let someone know and we will fix it")
+        return redirect('pace:pacechart')
 
 
 def is_teacher(user):
@@ -184,5 +185,44 @@ def delete_selected_chapter(request, teacher_name, student_name):
             return redirect('pace:teacher', teacher_name, student_name)
         else:
             return HttpResponse('deletion error')
+    else:
+        return redirect('pace:teacher', teacher_name, student_name)
+
+
+@login_required
+@user_passes_test(is_teacher)
+def edit_pace_dates(request, teacher_name, student_name):
+    if request.method == 'POST':
+        formset = modelformset_factory(PaceChapter, form=EditPaceDatesForm, fields=('chapter', 'pace_date',), extra=0)
+        formset = formset(queryset=PaceChapter.objects.filter(student__user__username=student_name).order_by('pace_date', 'chapter__book', 'chapter__chapter_number'))
+        comment = None
+        context = {
+            'teacher_name': teacher_name,
+            'student_name': student_name,
+            'form': formset,
+            'top_comment': comment,
+        }
+        return render(request, 'pace/editpacedates.html', context)
+    else:
+        return redirect('pace:teacher', teacher_name, student_name)
+
+@login_required
+@user_passes_test(is_teacher)
+def save_pace_dates(request, teacher_name, student_name):
+    if request.method == 'POST':
+        formset = modelformset_factory(PaceChapter, form=EditPaceDatesForm, fields=('chapter', 'pace_date',), extra=0)
+        form = formset(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('pace:teacher', teacher_name, student_name)
+        else:
+            comment = "Please correct the errors below"
+            context = {
+                'teacher_name': teacher_name,
+                'student_name': student_name,
+                'form': form,
+                'top_comment': comment,
+            }
+            return render(request, 'pace/editpacedates.html', context)
     else:
         return redirect('pace:teacher', teacher_name, student_name)

@@ -32,6 +32,16 @@ urlpatterns = [
         name='delete_selected_chapter'
     ),
     url(
+        r'^teacher/(?P<teacher_name>[a-zA-Z0-9 ]+)/(?P<student_name>[a-zA-Z0-9 ]+)/edit_pace_dates/$',
+        views.edit_pace_dates,
+        name='edit_pace_dates'
+    ),
+    url(
+        r'^teacher/(?P<teacher_name>[a-zA-Z0-9 ]+)/(?P<student_name>[a-zA-Z0-9 ]+)/save_pace_dates/$',
+        views.save_pace_dates,
+        name='save_pace_dates'
+    ),
+    url(
         r'^teacher/(?P<teacher_name>[a-zA-Z0-9 ]+)/(?P<student_name>[a-zA-Z0-9 ]+)/(?P<chosen_book>[a-zA-Z0-9 ]+)/add_selected_chapters/$',
         views.add_selected_chapters,
         name='add_selected_chapters'
