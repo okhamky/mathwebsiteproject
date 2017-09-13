@@ -48,6 +48,11 @@
                         {% csrf_token %}
                         <button type="submit" class="btn-sm btn-danger">Delete Chapter(s)</button>
                     </form>
+                    &nbsp;&nbsp;
+                    <form action="{% url 'pace:edit_pace_dates' teacher_name student_name %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-sm btn-warning">Edit Projected Dates</button>
+                    </form>
                 </div>
                 <br><br>
                 {% if student_chapters %}

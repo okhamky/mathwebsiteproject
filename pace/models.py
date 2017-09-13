@@ -43,7 +43,7 @@ class Chapter(models.Model):
         return self.book
 
     def __str__(self):
-        return str(self.chapter_number)
+        return str(self.book) + " - Chapter " + str(self.chapter_number)
 
 
 class PaceChapter(models.Model):
@@ -61,4 +61,4 @@ class PaceChapter(models.Model):
         ordering = ['pace_date']
 
     def __str__(self):
-        return self.chapter.book.book_name + ' - Chapter ' + str(self.chapter)
+        return str(self.chapter)
